@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyrhythm Experiment Tests</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Test-specific styles */
+        #test-results {
+            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 500px;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        #test-results h2 {
+            color: #fff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            margin-top: 10px;
+        }
+        
+        .test-pass {
+            color: #8cff8c;
+        }
+        
+        .test-fail {
+            color: #ff8c8c;
+        }
+        
+        .test-summary {
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #444;
+        }
+        
+        #run-tests-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 1000;
+        }
+        
+        #run-tests-button:hover {
+            background: #45a049;
+        }
+        
+        #test-loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas container from the main app -->
+    <div id="canvas-container"></div>
+    
+    <!-- Include all the UI elements from the main app so the tests can use them -->
+    <div id="controls">
+        <button id="start-stop-button">Start</button>
+        <button id="open-modal-btn">Settings</button>
+    </div>
+    
+    <!-- Modal for controls -->
+    <div id="controls-modal">
+        <div class="modal-content">
+            <span id="close-modal-btn" class="close">&times;</span>
+            
+            <div class="tabs">
+                <button id="tab-global" class="tab-btn active">Global Settings</button>
+                <button id="tab-tracks" class="tab-btn">Track Settings</button>
+            </div>
+            
+            <div id="tab-global-content">
+                <h3>Global Settings</h3>
+                <div class="control-group">
+                    <label for="tempo">Tempo (BPM):</label>
+                    <input type="range" id="tempo" min="1" max="240" value="60">
+                    <span id="tempo-value">60</span>
+                </div>
+                
+                <div class="control-group">
+                    <label for="visualization-mode">Visualization:</label>
+                    <select id="visualization-mode">
+                        <option value="circular">Circular</option>
+                        <option value="pendulum">Pendulum</option>
+                        <option value="spiral">Spiral</option>
+                        <option value="gravity">Gravity Wells</option>
+                    </select>
+                </div>
+                
+                <h3>Background</h3>
+                <div class="control-group">
+                    <label for="background-color-picker">Background Color:</label>
+                    <input type="color" id="background-color-picker" value="#0C0C14">
+                </div>
+                <div class="control-group">
+                    <label for="background-opacity">Opacity:</label>
+                    <input type="range" id="background-opacity" min="0" max="100" value="100">
+                    <span id="background-opacity-value">100</span>
+                </div>
+                <div class="control-group">
+                    <button id="reset-background-color">Reset to Default</button>
+                </div>
+                
+                <h3>Global Effects</h3>
+                <div class="control-group">
+                    <label for="global-reverb">Reverb Amount:</label>
+                    <input type="range" id="global-reverb" min="0" max="1" step="0.01" value="0.5">
+                </div>
+                
+                <div class="control-group">
+                    <label for="global-delay-time">Delay Time (s):</label>
+                    <input type="range" id="global-delay-time" min="0" max="0.5" step="0.01" value="0.15">
+                </div>
+                
+                <div class="control-group">
+                    <label for="global-delay-feedback">Delay Feedback:</label>
+                    <input type="range" id="global-delay-feedback" min="0" max="0.9" step="0.01" value="0.3">
+                </div>
+                
+                <div class="control-group">
+                    <label for="global-filter-q">Filter Resonance (Q):</label>
+                    <input type="range" id="global-filter-q" min="0.1" max="20" step="0.1" value="1">
+                </div>
+                
+                <div class="control-group">
+                    <label for="global-filter-cutoff">Filter Cutoff (Hz):</label>
+                    <input type="range" id="global-filter-cutoff" min="100" max="5000" step="1" value="2000">
+                </div>
+                
+                <div class="control-group">
+                    <label for="global-waveform">Waveform:</label>
+                    <select id="global-waveform">
+                        <option value="sine">Sine</option>
+                        <option value="square">Square</option>
+                        <option value="triangle">Triangle</option>
+                        <option value="sawtooth">Sawtooth</option>
+                        <option value="mix">Mix</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="tab-tracks-content" style="display: none;">
+                <h3>Track Settings</h3>
+                <div class="control-group">
+                    <label for="num-tracks">Number of Tracks:</label>
+                    <input type="number" id="num-tracks" min="1" max="16" value="4">
+                    <button id="update-tracks-button">Update</button>
+                </div>
+                <div id="track-specific-controls"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Test Results Panel -->
+    <div id="test-results" style="display: none;">
+        <h2>Polyrhythm Experiment Test Results</h2>
+        <div id="test-output"></div>
+    </div>
+    
+    <!-- Test Loader -->
+    <div id="test-loader">Running tests...</div>
+    
+    <!-- Run Tests Button -->
+    <button id="run-tests-button">Run Tests</button>
+    
+    <!-- Load required libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
+    
+    <!-- Set test mode flag -->
+    <script>
+        window.isTestMode = true;
+        console.log = function() {
+            // Store original console.log
+            const originalConsole = window.originalConsole || console;
+            
+            // Build message from all arguments
+            let message = Array.from(arguments).map(arg => {
+                if (typeof arg === 'object') {
+                    try {
+                        return JSON.stringify(arg);
+                    } catch (e) {
+                        return arg.toString();
+                    }
+                } else {
+                    return arg;
+                }
+            }).join(' ');
+            
+            // Output to original console
+            originalConsole.log.apply(console, arguments);
+            
+            // Add to test output if it exists
+            const testOutput = document.getElementById('test-output');
+            if (testOutput) {
+                const line = document.createElement('div');
+                if (message.includes('PASS:')) {
+                    line.className = 'test-pass';
+                } else if (message.includes('FAIL:')) {
+                    line.className = 'test-fail';
+                }
+                line.textContent = message;
+                testOutput.appendChild(line);
+                
+                // Scroll to bottom
+                testOutput.scrollTop = testOutput.scrollHeight;
+            }
+        };
+        
+        // Also capture console.error
+        console.error = function() {
+            // Store original console.error
+            const originalConsole = window.originalConsole || console;
+            
+            // Output to original console
+            originalConsole.error.apply(console, arguments);
+            
+            // Build message from all arguments
+            let message = Array.from(arguments).map(arg => {
+                if (typeof arg === 'object') {
+                    try {
+                        return JSON.stringify(arg);
+                    } catch (e) {
+                        return arg.toString();
+                    }
+                } else {
+                    return arg;
+                }
+            }).join(' ');
+            
+            // Add to test output if it exists
+            const testOutput = document.getElementById('test-output');
+            if (testOutput) {
+                const line = document.createElement('div');
+                line.className = 'test-fail';
+                line.textContent = message;
+                testOutput.appendChild(line);
+                
+                // Scroll to bottom
+                testOutput.scrollTop = testOutput.scrollHeight;
+            }
+        };
+    </script>
+    
+    <!-- Load main application with test mode -->
+    <script type="module" src="js/app.js"></script>
+    
+    <!-- Test runner script -->
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', function() {
+            const runTestsButton = document.getElementById('run-tests-button');
+            const testResults = document.getElementById('test-results');
+            const testOutput = document.getElementById('test-output');
+            const testLoader = document.getElementById('test-loader');
+            
+            runTestsButton.addEventListener('click', async function() {
+                // Clear previous test results
+                testOutput.innerHTML = '';
+                testResults.style.display = 'block';
+                testLoader.style.display = 'block';
+                
+                try {
+                    // Load test modules
+                    const AppTests = (await import('./js/tests/app.test.js')).default;
+                    const VisualTests = (await import('./js/tests/visual.test.js')).default;
+                    const AudioTests = (await import('./js/tests/audio.test.js')).default;
+                    const StateTests = (await import('./js/tests/state.test.js')).default;
+                    
+                    // Run the tests
+                    const appTester = new AppTests();
+                    const visualTester = new VisualTests();
+                    const audioTester = new AudioTests();
+                    const stateTester = new StateTests();
+                    
+                    // Run state tests first since that's what we're fixing
+                    console.log('--- STATE MODULE TESTS ---');
+                    const stateResults = await stateTester.runTests();
+                    
+                    // Run app tests
+                    console.log('--- APP TESTS ---');
+                    const appResults = await appTester.runTests();
+                    
+                    // Run visual tests
+                    console.log('--- VISUAL TESTS ---');
+                    const visualResults = await visualTester.runTests();
+                    
+                    // Run audio tests
+                    console.log('--- AUDIO TESTS ---');
+                    const audioResults = await audioTester.runTests();
+                    
+                    // Combine results
+                    const totalPassed = stateResults.passed + appResults.passed + visualResults.passed + audioResults.passed;
+                    const totalFailed = stateResults.failed + appResults.failed + visualResults.failed + audioResults.failed;
+                    const totalTests = totalPassed + totalFailed;
+                    
+                    // Add summary
+                    const summary = document.createElement('div');
+                    summary.className = 'test-summary';
+                    summary.innerHTML = `
+                        <p>Total Tests: ${totalTests}</p>
+                        <p class="test-pass">Passed: ${totalPassed}</p>
+                        <p class="test-fail">Failed: ${totalFailed}</p>
+                        <p>Pass Rate: ${((totalPassed / totalTests) * 100).toFixed(1)}%</p>
+                    `;
+                    testOutput.appendChild(summary);
+                    
+                    // Make results globally available
+                    window.testResults = {
+                        state: stateResults,
+                        app: appResults,
+                        visual: visualResults,
+                        audio: audioResults,
+                        totalPassed,
+                        totalFailed,
+                        totalTests
+                    };
+                } catch (error) {
+                    console.error('Error running tests:', error);
+                    const errorLine = document.createElement('div');
+                    errorLine.className = 'test-fail';
+                    errorLine.textContent = `Error running tests: ${error.message}`;
+                    testOutput.appendChild(errorLine);
+                } finally {
+                    testLoader.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

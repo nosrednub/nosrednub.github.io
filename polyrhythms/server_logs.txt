@@ -1,0 +1,66 @@
+2025-05-09 17:01:35,570 - WARNING - Port 5555 is already in use
+2025-05-09 17:01:35,570 - INFO - Trying fallback port 8000...
+2025-05-09 17:01:35,571 - INFO - Server started at http://localhost:8000
+2025-05-09 17:01:35,571 - INFO - Serving files from: /Users/nosrednub/Sites/Gemini
+2025-05-09 17:01:35,571 - INFO - Press Ctrl+C to stop the server
+2025-05-09 17:05:34,037 - WARNING - Port 5555 is already in use
+2025-05-09 17:05:34,037 - INFO - Trying fallback port 8000...
+2025-05-09 17:05:34,037 - WARNING - Port 8000 is already in use
+2025-05-09 17:05:34,037 - INFO - Trying fallback port 8080...
+2025-05-09 17:05:34,037 - INFO - Server started at http://localhost:8080
+2025-05-09 17:05:34,037 - INFO - Serving files from: /Users/nosrednub/Sites/Gemini
+2025-05-09 17:05:34,037 - INFO - Press Ctrl+C to stop the server
+2025-05-09 17:09:06,690 - WARNING - Port 5555 is already in use
+2025-05-09 17:09:06,690 - INFO - Trying fallback port 8000...
+2025-05-09 17:09:06,690 - WARNING - Port 8000 is already in use
+2025-05-09 17:09:06,690 - INFO - Trying fallback port 8080...
+2025-05-09 17:09:06,690 - WARNING - Port 8080 is already in use
+2025-05-09 17:09:06,690 - INFO - Trying fallback port 3000...
+2025-05-09 17:09:06,690 - WARNING - Port 3000 is already in use
+2025-05-09 17:09:06,690 - ERROR - Failed to start server on any port. Please check if another process is using these ports.
+2025-05-09 17:15:27,825 - WARNING - Port 5555 is already in use
+2025-05-09 17:15:27,825 - INFO - Trying fallback port 8000...
+2025-05-09 17:15:27,825 - WARNING - Port 8000 is already in use
+2025-05-09 17:15:27,825 - INFO - Trying fallback port 8080...
+2025-05-09 17:15:27,825 - WARNING - Port 8080 is already in use
+2025-05-09 17:15:27,825 - INFO - Trying fallback port 3000...
+2025-05-09 17:15:27,825 - WARNING - Port 3000 is already in use
+2025-05-09 17:15:27,825 - ERROR - Failed to start server on any port. Please check if another process is using these ports.
+2025-05-09 17:16:08,565 - INFO - 127.0.0.1 - "HEAD / HTTP/1.1" 200 -
+2025-05-09 17:16:16,650 - INFO - 127.0.0.1 - "GET / HTTP/1.1" 302 -
+2025-05-09 17:16:16,655 - INFO - GET request for /server-redirect.html -> /Users/nosrednub/Sites/Gemini/server-redirect.html
+2025-05-09 17:16:16,656 - INFO - 127.0.0.1 - "GET /server-redirect.html HTTP/1.1" 200 -
+2025-05-09 17:16:16,656 - INFO - Successfully served /Users/nosrednub/Sites/Gemini/server-redirect.html as text/html; charset=UTF-8
+2025-05-09 17:16:16,671 - INFO - GET request for /favicon.ico -> /Users/nosrednub/Sites/Gemini/favicon.ico
+2025-05-09 17:16:16,672 - INFO - 127.0.0.1 - "GET /favicon.ico HTTP/1.1" 200 -
+2025-05-09 17:16:16,676 - INFO - Successfully served /Users/nosrednub/Sites/Gemini/favicon.ico as image/x-icon
+2025-05-09 17:17:15,431 - WARNING - Port 5555 is already in use
+2025-05-09 17:17:15,431 - INFO - Trying fallback port 8000...
+2025-05-09 17:17:15,431 - INFO - Server started at http://localhost:8000
+2025-05-09 17:17:15,432 - INFO - Serving files from: /Users/nosrednub/Sites/Gemini
+2025-05-09 17:17:15,432 - INFO - Press Ctrl+C to stop the server
+2025-05-09 17:24:44,857 - WARNING - Port 5555 is already in use
+2025-05-09 17:24:44,857 - INFO - Trying fallback port 8000...
+2025-05-09 17:24:44,857 - WARNING - Port 8000 is already in use
+2025-05-09 17:24:44,857 - INFO - Trying fallback port 8080...
+2025-05-09 17:24:44,857 - INFO - Server started at http://localhost:8080
+2025-05-09 17:24:44,857 - INFO - Serving files from: /Users/nosrednub/Sites/Gemini
+2025-05-09 17:24:44,857 - INFO - Press Ctrl+C to stop the server
+2025-05-09 17:36:48,420 - INFO - 127.0.0.1 - "GET / HTTP/1.1" 302 -
+2025-05-09 17:36:48,422 - INFO - GET request for /server-redirect.html -> /Users/nosrednub/Sites/Gemini/server-redirect.html
+2025-05-09 17:36:48,422 - INFO - 127.0.0.1 - "GET /server-redirect.html HTTP/1.1" 200 -
+2025-05-09 17:36:48,422 - INFO - Successfully served /Users/nosrednub/Sites/Gemini/server-redirect.html as text/html; charset=UTF-8
+2025-05-09 17:36:48,444 - INFO - GET request for /favicon.ico -> /Users/nosrednub/Sites/Gemini/favicon.ico
+2025-05-09 17:36:48,445 - INFO - 127.0.0.1 - "GET /favicon.ico HTTP/1.1" 200 -
+2025-05-09 17:36:48,447 - INFO - Successfully served /Users/nosrednub/Sites/Gemini/favicon.ico as image/x-icon
+2025-05-09 17:36:51,029 - INFO - GET request for /server-redirect.html -> /Users/nosrednub/Sites/Gemini/server-redirect.html
+2025-05-09 17:36:51,030 - INFO - 127.0.0.1 - "GET /server-redirect.html HTTP/1.1" 200 -
+2025-05-09 17:36:51,030 - INFO - Successfully served /Users/nosrednub/Sites/Gemini/server-redirect.html as text/html; charset=UTF-8
+2025-05-09 17:36:51,042 - INFO - GET request for /favicon.ico -> /Users/nosrednub/Sites/Gemini/favicon.ico
+2025-05-09 17:36:51,043 - INFO - 127.0.0.1 - "GET /favicon.ico HTTP/1.1" 200 -
+2025-05-09 17:36:51,043 - INFO - Successfully served /Users/nosrednub/Sites/Gemini/favicon.ico as image/x-icon
+2025-05-09 17:37:08,948 - INFO - GET request for /.well-known/appspecific/com.chrome.devtools.json -> /Users/nosrednub/Sites/Gemini/.well-known/appspecific/com.chrome.devtools.json
+2025-05-09 17:37:08,948 - WARNING - File not found: /Users/nosrednub/Sites/Gemini/.well-known/appspecific/com.chrome.devtools.json
+2025-05-09 17:37:08,948 - ERROR - 127.0.0.1 - code 404, message File not found: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-09 17:37:08,948 - INFO - 127.0.0.1 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+2025-05-09 17:37:24,242 - INFO - 127.0.0.1 - "HEAD /js/config.js HTTP/1.1" 200 -

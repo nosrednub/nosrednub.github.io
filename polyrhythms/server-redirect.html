@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyrhythm Server Redirect</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 800px;
+            text-align: center;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #2a2a2a;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #F44336;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #3e8e41;
+        }
+        .loading {
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #4CAF50;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Polyrhythm Server Redirect</h1>
+        <p>Checking available servers and redirecting to the correct port...</p>
+        
+        <div class="status" id="status">
+            <div class="loading">
+                <div class="spinner"></div>
+                <span>Checking server availability...</span>
+            </div>
+        </div>
+        
+        <div id="manual-controls" style="display: none;">
+            <p>You can also try these ports manually:</p>
+            <button onclick="redirectToPort(5555)">Try Port 5555</button>
+            <button onclick="redirectToPort(8000)">Try Port 8000</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to check if a server is running on a specific port
+        async function checkServer(port) {
+            try {
+                const response = await fetch(`http://localhost:${port}/js/config.js`, {
+                    method: 'HEAD',
+                    cache: 'no-cache',
+                    mode: 'no-cors' // This is important for cross-origin requests
+                });
+                return true; // If no error, server is running
+            } catch (error) {
+                console.log(`Error checking port ${port}:`, error);
+                return false; // Server not running or error
+            }
+        }
+        
+        // Function to redirect to a specific port
+        function redirectToPort(port) {
+            const newUrl = `http://localhost:${port}/index.html`;
+            document.getElementById('status').innerHTML = 
+                `<div class="success">Redirecting to ${newUrl}...</div>`;
+            
+            // Set a cookie to remember the working port
+            document.cookie = `workingPort=${port}; path=/; max-age=86400`;
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                window.location.href = newUrl;
+            }, 1000);
+        }
+        
+        // Function to clear browser cache for the config.js file
+        function clearConfigCache() {
+            // Try to force a cache-busting reload of config.js
+            const cacheBuster = Date.now();
+            const configScript = document.createElement('script');
+            configScript.src = `http://localhost:5555/js/config.js?cb=${cacheBuster}`;
+            configScript.type = 'module';
+            document.head.appendChild(configScript);
+            
+            // Remove after loading or error
+            configScript.onload = configScript.onerror = () => {
+                document.head.removeChild(configScript);
+            };
+        }
+        
+        // Main function to check servers and redirect
+        async function checkAndRedirect() {
+            // First check if we have a cookie with a working port
+            const workingPortMatch = document.cookie.match(/workingPort=(\d+)/);
+            if (workingPortMatch) {
+                const savedPort = parseInt(workingPortMatch[1]);
+                
+                document.getElementById('status').innerHTML = 
+                    `<div>Found saved port: ${savedPort}, checking if it's still available...</div>`;
+                
+                const isAvailable = await checkServer(savedPort);
+                if (isAvailable) {
+                    redirectToPort(savedPort);
+                    return;
+                }
+            }
+            
+            // Try port 5555 (enhanced server)
+            document.getElementById('status').innerHTML = 
+                `<div>Checking if server is running on port 5555...</div>`;
+            
+            const is5555Available = await checkServer(5555);
+            if (is5555Available) {
+                redirectToPort(5555);
+                return;
+            }
+            
+            // Try port 8000 (default Python http.server port)
+            document.getElementById('status').innerHTML = 
+                `<div>Checking if server is running on port 8000...</div>`;
+                
+            const is8000Available = await checkServer(8000);
+            if (is8000Available) {
+                redirectToPort(8000);
+                return;
+            }
+            
+            // If no servers are available, show manual controls
+            document.getElementById('status').innerHTML = 
+                `<div class="error">No servers found on common ports (5555, 8000). Please check if the server is running.</div>`;
+            document.getElementById('manual-controls').style.display = 'block';
+            
+            // Also clear config.js cache in case that's the issue
+            clearConfigCache();
+        }
+        
+        // Start checking when page loads
+        window.onload = checkAndRedirect;
+    </script>
+</body>
+</html> 

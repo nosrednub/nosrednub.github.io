@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyrhythm Experiment Debug</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+<body>
+    <h1>Polyrhythm Experiment Module Debug</h1>
+    <div id="debug-output">
+        <h2>Module Loading Tests</h2>
+        <button id="test-module-loading">Test Module Loading</button>
+        <button id="test-audio-module">Test Audio Module</button>
+        <button id="test-scheduler-module">Test Scheduler Module</button>
+        <button id="test-visualizations-module">Test Visualizations Module</button>
+        <button id="test-all-modules">Test All Modules</button>
+        <div id="results"></div>
+    </div>
+    
+    <script type="module">
+        import * as debugTools from './js/debug.js';
+        
+        document.getElementById('test-module-loading').addEventListener('click', () => {
+            const result = debugTools.testModuleLoading();
+            displayResult('Module Loading Test', result);
+        });
+        
+        document.getElementById('test-audio-module').addEventListener('click', async () => {
+            const result = await debugTools.testAudioModule();
+            displayResult('Audio Module Test', result);
+        });
+        
+        document.getElementById('test-scheduler-module').addEventListener('click', async () => {
+            const result = await debugTools.testSchedulerModule();
+            displayResult('Scheduler Module Test', result);
+        });
+        
+        document.getElementById('test-visualizations-module').addEventListener('click', async () => {
+            const result = await debugTools.testVisualizationsModule();
+            displayResult('Visualizations Module Test', result);
+        });
+        
+        document.getElementById('test-all-modules').addEventListener('click', async () => {
+            const result = await debugTools.testAllModules();
+            displayResult('All Modules Test', JSON.stringify(result));
+        });
+        
+        function displayResult(testName, result) {
+            const resultsDiv = document.getElementById('results');
+            const resultItem = document.createElement('div');
+            resultItem.innerHTML = `<strong>${testName}:</strong> ${result}`;
+            resultsDiv.appendChild(resultItem);
+            console.log(`${testName} Result:`, result);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyrhythm Troubleshooting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .log {
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            margin: 10px 0;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #F44336; }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #444; }
+    </style>
+</head>
+<body>
+    <h1>Polyrhythm Module Troubleshooting</h1>
+    <div id="controls">
+        <button id="test-config">Test Config Module</button>
+        <button id="test-config-minimal">Test Minimal Config Module</button>
+        <button id="test-visualizations">Test Visualizations Module</button>
+        <button id="test-audio">Test Audio Module</button>
+        <button id="test-all">Test All Modules</button>
+    </div>
+    <div id="logs"></div>
+
+    <script>
+        // Function to log messages
+        function log(message, type = 'info') {
+            const logElement = document.createElement('div');
+            logElement.className = `log ${type}`;
+            logElement.textContent = message;
+            document.getElementById('logs').appendChild(logElement);
+        }
+
+        // Test config module
+        document.getElementById('test-config').addEventListener('click', async () => {
+            try {
+                log('Testing config.js module...');
+                const configModule = await import('./js/config.js');
+                log('Config module loaded successfully!', 'success');
+                log('Exported values: ' + Object.keys(configModule).join(', '));
+            } catch (error) {
+                log(`Error loading config module: ${error.message}`, 'error');
+                console.error(error);
+            }
+        });
+
+        // Test minimal config module
+        document.getElementById('test-config-minimal').addEventListener('click', async () => {
+            try {
+                log('Testing minimal config.js module...');
+                const configModule = await import('./js/config.minimal.js');
+                log('Minimal config module loaded successfully!', 'success');
+                log('Exported values: ' + Object.keys(configModule).join(', '));
+            } catch (error) {
+                log(`Error loading minimal config module: ${error.message}`, 'error');
+                console.error(error);
+            }
+        });
+
+        // Test visualizations module
+        document.getElementById('test-visualizations').addEventListener('click', async () => {
+            try {
+                log('Testing visualizations.js module...');
+                const visualizationsModule = await import('./js/visualizations.js');
+                log('Visualizations module loaded successfully!', 'success');
+                log('Exported functions: ' + Object.keys(visualizationsModule).join(', '));
+            } catch (error) {
+                log(`Error loading visualizations module: ${error.message}`, 'error');
+                console.error(error);
+            }
+        });
+
+        // Test audio module
+        document.getElementById('test-audio').addEventListener('click', async () => {
+            try {
+                log('Testing audio.js module...');
+                const audioModule = await import('./js/audio.js');
+                log('Audio module loaded successfully!', 'success');
+                log('Exported functions: ' + Object.keys(audioModule).join(', '));
+            } catch (error) {
+                log(`Error loading audio module: ${error.message}`, 'error');
+                console.error(error);
+            }
+        });
+
+        // Test all modules
+        document.getElementById('test-all').addEventListener('click', async () => {
+            try {
+                log('Testing all modules sequentially...');
+                
+                // Test config.js
+                try {
+                    const configModule = await import('./js/config.js');
+                    log('Config module loaded successfully!', 'success');
+                } catch (error) {
+                    log(`Error loading config module: ${error.message}`, 'error');
+                    throw error; // Stop testing if config fails
+                }
+                
+                // Test audio.js
+                try {
+                    const audioModule = await import('./js/audio.js');
+                    log('Audio module loaded successfully!', 'success');
+                } catch (error) {
+                    log(`Error loading audio module: ${error.message}`, 'error');
+                    throw error;
+                }
+                
+                // Test visualizations.js
+                try {
+                    const visualizationsModule = await import('./js/visualizations.js');
+                    log('Visualizations module loaded successfully!', 'success');
+                } catch (error) {
+                    log(`Error loading visualizations module: ${error.message}`, 'error');
+                    throw error;
+                }
+                
+                log('All modules loaded successfully!', 'success');
+            } catch (error) {
+                log(`Error in module loading chain: ${error.message}`, 'error');
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html> 

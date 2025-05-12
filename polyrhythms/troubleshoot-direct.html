@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Script Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        canvas {
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Direct Script Test</h1>
+        <p>This page uses direct script tags instead of ES modules to test for browser compatibility issues.</p>
+        <div id="canvas-container"></div>
+    </div>
+
+    <script>
+        // Simple p5.js sketch to test if the canvas is working
+        function setup() {
+            const canvas = createCanvas(400, 300);
+            canvas.parent('canvas-container');
+            colorMode(HSB, 360, 100, 100, 100);
+            console.log('Canvas created successfully!');
+        }
+
+        function draw() {
+            background(20, 80, 10, 100);
+            
+            // Draw a simple visualization
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Draw orbit
+            noFill();
+            stroke(180, 80, 90, 30);
+            strokeWeight(2);
+            ellipse(centerX, centerY, 100, 100);
+            
+            // Draw moving particle
+            const angle = (frameCount * 0.02) % TWO_PI;
+            const x = centerX + 50 * cos(angle);
+            const y = centerY + 50 * sin(angle);
+            
+            fill(180, 80, 90);
+            noStroke();
+            ellipse(x, y, 10, 10);
+            
+            // Draw central point
+            fill(60, 0, 100);
+            ellipse(centerX, centerY, 5, 5);
+        }
+    </script>
+</body>
+</html> 

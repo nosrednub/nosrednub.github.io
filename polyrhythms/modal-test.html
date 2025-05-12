@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Test</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Extra styles for the test page */
+        #test-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+        .test-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            padding: 10px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="test-animation"></canvas>
+    
+    <div class="test-controls">
+        <button id="open-modal-test">Open Modal</button>
+    </div>
+    
+    <button id="open-modal-btn">⚙️</button>
+    
+    <div id="controls-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Polyrhythm Controls</span>
+                <span class="close" id="close-modal-btn">&times;</span>
+            </div>
+            <div id="preview-canvas-container">
+                <canvas id="preview-canvas" width="240" height="140"></canvas>
+            </div>
+            <div class="modal-tabs">
+                <button class="modal-tab active" id="tab-global">Global</button>
+                <button class="modal-tab" id="tab-tracks">Tracks</button>
+            </div>
+            <div class="modal-body">
+                <div id="tab-global-content">
+                    <div class="section-label">Test Global Settings</div>
+                    <div class="control-group">
+                        <label for="tempo">Tempo (BPM): <span id="tempo-value">120</span></label>
+                        <input type="range" id="tempo" min="1" max="240" value="60">
+                    </div>
+                    <div class="control-group">
+                        <button id="test-button">Test Button</button>
+                    </div>
+                </div>
+                <div id="tab-tracks-content" style="display:none;">
+                    <div class="section-label">Test Tracks Content</div>
+                    <p>This is the tracks tab content for testing.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple animation for testing transparent modal
+        const canvas = document.getElementById('test-animation');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Animation variables
+        const circles = [];
+        for (let i = 0; i < 10; i++) {
+            circles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: 20 + Math.random() * 40,
+                color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                speed: 1 + Math.random() * 2,
+                angle: Math.random() * Math.PI * 2
+            });
+        }
+        
+        // Animation loop
+        function animate() {
+            ctx.fillStyle = 'rgba(20, 20, 20, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            circles.forEach(circle => {
+                // Move in current direction
+                circle.x += Math.cos(circle.angle) * circle.speed;
+                circle.y += Math.sin(circle.angle) * circle.speed;
+                
+                // Bounce off edges
+                if (circle.x < 0 || circle.x > canvas.width) {
+                    circle.angle = Math.PI - circle.angle;
+                }
+                if (circle.y < 0 || circle.y > canvas.height) {
+                    circle.angle = -circle.angle;
+                }
+                
+                // Draw circle
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = circle.color;
+                ctx.fill();
+                
+                // Small chance to change direction
+                if (Math.random() < 0.01) {
+                    circle.angle += (Math.random() - 0.5) * Math.PI / 2;
+                }
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+        
+        // Modal controls
+        const modal = document.getElementById('controls-modal');
+        const openBtn = document.getElementById('open-modal-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const testOpenBtn = document.getElementById('open-modal-test');
+        const previewCanvas = document.getElementById('preview-canvas');
+        const tabGlobal = document.getElementById('tab-global');
+        const tabTracks = document.getElementById('tab-tracks');
+        const tabGlobalContent = document.getElementById('tab-global-content');
+        const tabTracksContent = document.getElementById('tab-tracks-content');
+        
+        // Open modal
+        function openModal() {
+            modal.style.display = 'block';
+            
+            // Get preview context
+            const previewCtx = previewCanvas.getContext('2d');
+            previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+            previewCtx.fillStyle = 'rgba(24, 24, 24, 0.7)';
+            previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+            
+            // Draw a scaled down version of the main animation
+            previewCtx.drawImage(
+                canvas, 
+                0, 0, canvas.width, canvas.height,
+                0, 0, previewCanvas.width, previewCanvas.height
+            );
+        }
+        
+        // Close modal
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+        
+        // Tab switching
+        tabGlobal.onclick = () => {
+            tabGlobal.classList.add('active');
+            tabTracks.classList.remove('active');
+            tabGlobalContent.style.display = '';
+            tabTracksContent.style.display = 'none';
+        };
+        
+        tabTracks.onclick = () => {
+            tabTracks.classList.add('active');
+            tabGlobal.classList.remove('active');
+            tabTracksContent.style.display = '';
+            tabGlobalContent.style.display = 'none';
+        };
+        
+        // Event listeners
+        openBtn.addEventListener('click', openModal);
+        testOpenBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        
+        // Close when clicking outside the modal content
+        window.addEventListener('click', event => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // Start with modal closed
+        modal.style.display = 'none';
+    </script>
+</body>
+</html> 

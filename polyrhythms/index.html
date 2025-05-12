@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyrhythm Experiment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <!-- No p5.sound.min.js needed as we'll use Web Audio API directly -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script>
+        // Helper to force repaints when visualization mode changes
+        window.forceVisualizationUpdate = function(mode) {
+            console.log('Forcing visualization update for mode:', mode);
+            // Force layout recalculation for a brief moment to help trigger redraw
+            document.body.style.opacity = '0.99';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+                // Also manually update the global visualization mode in case it wasn't updated
+                window.visualizationMode = mode;
+                console.log('Forced update complete for mode:', mode);
+            }, 10);
+        };
+    </script>
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- p5.js canvas will go here -->
+        <button id="open-modal-btn">⚙️</button>
+    </div>
+    <div id="controls-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Polyrhythm Controls</span>
+                <span class="close" id="close-modal-btn">&times;</span>
+            </div>
+            <div class="modal-tabs">
+                <button class="modal-tab active" id="tab-global">Global</button>
+                <button class="modal-tab" id="tab-tracks">Tracks</button>
+            </div>
+            <div class="modal-body">
+                <div id="tab-global-content">
+                    <div class="section-label">Global Settings</div>
+                    <div class="control-group">
+                        <label for="tempo">Tempo (BPM): <span id="tempo-value">120</span></label>
+                        <input type="range" id="tempo" min="1" max="240" value="60">
+                    </div>
+                    <div class="control-group">
+                        <label for="num-tracks">Number of Tracks (1-8):</label>
+                        <input type="number" id="num-tracks" value="3" min="1" max="8">
+                        <button id="update-tracks-button">Set Tracks</button>
+                    </div>
+                    <div class="control-group">
+                        <button id="start-stop-button">Start</button>
+                    </div>
+                    <div class="control-group">
+                        <label for="visualization-mode">Visualization Mode:</label>
+                        <select id="visualization-mode">
+                            <option value="circular">Circular Orbits</option>
+                            <option value="pendulum">Pendulum Wave</option>
+                            <option value="spiral">Spiral Paths</option>
+                            <option value="gravity">Gravity Wells</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="background-color">Background Color:</label>
+                        <div class="color-control-row">
+                            <input type="color" id="background-color-picker" value="#141405">
+                            <button id="reset-background-color" class="small-button">Reset</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="background-opacity">Background Opacity: <span id="background-opacity-value">100</span>%</label>
+                        <input type="range" id="background-opacity" min="10" max="100" value="100">
+                    </div>
+                </div>
+                <div id="tab-tracks-content" style="display:none;">
+                    <div class="section-label">Global Effects</div>
+                    <div class="global-effects-panel">
+                        <div class="global-effects-title">Effects applied to all tracks (can be overridden per track)</div>
+                        <div class="effects-grid">
+                            <div class="effect-group">
+                                <label for="global-reverb">Reverb Amount:</label>
+                                <input type="range" id="global-reverb" min="0" max="1" step="0.01" value="0.5">
+                            </div>
+                            <div class="effect-group">
+                                <label for="global-delay-time">Delay Time (s):</label>
+                                <input type="range" id="global-delay-time" min="0" max="0.5" step="0.01" value="0.15">
+                            </div>
+                            <div class="effect-group">
+                                <label for="global-delay-feedback">Delay Feedback:</label>
+                                <input type="range" id="global-delay-feedback" min="0" max="0.9" step="0.01" value="0.3">
+                            </div>
+                            <div class="effect-group">
+                                <label for="global-filter-q">Filter Resonance (Q):</label>
+                                <input type="range" id="global-filter-q" min="0.1" max="20" step="0.1" value="1">
+                            </div>
+                            <div class="effect-group">
+                                <label for="global-filter-cutoff">Filter Cutoff (Hz):</label>
+                                <input type="range" id="global-filter-cutoff" min="100" max="5000" step="1" value="2000">
+                            </div>
+                            <div class="effect-group">
+                                <label for="global-waveform">Waveform:</label>
+                                <select id="global-waveform">
+                                    <option value="sine">Sine</option>
+                                    <option value="square">Square</option>
+                                    <option value="triangle">Triangle</option>
+                                    <option value="sawtooth">Sawtooth</option>
+                                    <option value="mix">Mix</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-label">Tracks</div>
+                    <div class="tracks-container" id="track-specific-controls">
+                        <!-- Track controls will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Debug script to monitor network requests -->
+    <script>
+        console.log("Current URL:", window.location.href);
+        
+        // Create a div to show debugging info
+        const debugDiv = document.createElement('div');
+        debugDiv.style.position = 'fixed';
+        debugDiv.style.bottom = '10px';
+        debugDiv.style.right = '10px';
+        debugDiv.style.background = 'rgba(0,0,0,0.7)';
+        debugDiv.style.color = 'white';
+        debugDiv.style.padding = '10px';
+        debugDiv.style.borderRadius = '5px';
+        debugDiv.style.maxWidth = '400px';
+        debugDiv.style.maxHeight = '200px';
+        debugDiv.style.overflow = 'auto';
+        debugDiv.style.zIndex = '9999';
+        debugDiv.innerHTML = '<h3>Network Debug</h3>';
+        document.body.appendChild(debugDiv);
+        
+        // Monitor network requests
+        const originalFetch = window.fetch;
+        window.fetch = function() {
+            debugDiv.innerHTML += `<p>Fetch: ${arguments[0]}</p>`;
+            return originalFetch.apply(this, arguments);
+        };
+        
+        // Monitor XHR requests
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function() {
+            debugDiv.innerHTML += `<p>XHR: ${arguments[1]}</p>`;
+            return originalXHROpen.apply(this, arguments);
+        };
+        
+        // Monitor script loads
+        document.addEventListener('load', function(e) {
+            if (e.target.tagName === 'SCRIPT') {
+                debugDiv.innerHTML += `<p>Script: ${e.target.src}</p>`;
+            }
+        }, true);
+    </script>
+    <script type="module" src="js/app.js?v=20250511"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Test</title>
+</head>
+<body>
+    <h1>Testing Module Import</h1>
+    <div id="result"></div>
+
+    <script type="module">
+        console.log('Starting module test...');
+        try {
+            import('./js/config-test.js')
+                .then(module => {
+                    console.log('Module loaded successfully!');
+                    document.getElementById('result').textContent = 
+                        `Default tempo: ${module.defaultTempo}, Visualization: ${module.defaultVisualizationMode}`;
+                })
+                .catch(error => {
+                    console.error('Failed to load module:', error);
+                    document.getElementById('result').textContent = 
+                        `Error: ${error.message}`;
+                });
+        } catch (error) {
+            console.error('Exception in module loading:', error);
+            document.getElementById('result').textContent = 
+                `Exception: ${error.message}`;
+        }
+    </script>
+</body>
+</html> 

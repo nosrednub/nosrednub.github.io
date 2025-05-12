@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Test</title>
+</head>
+<body>
+    <h1>Testing App Module</h1>
+    <div id="result">Loading...</div>
+
+    <script type="module">
+        console.log('Starting app test...');
+        try {
+            import('./js/app-test.js')
+                .then(module => {
+                    console.log('App module loaded successfully!');
+                    document.getElementById('result').textContent = 
+                        `App loaded: ${module.testLoaded}`;
+                })
+                .catch(error => {
+                    console.error('Failed to load app module:', error);
+                    document.getElementById('result').textContent = 
+                        `Error: ${error.message}`;
+                });
+        } catch (error) {
+            console.error('Exception in app module loading:', error);
+            document.getElementById('result').textContent = 
+                `Exception: ${error.message}`;
+        }
+    </script>
+</body>
+</html> 
